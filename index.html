@@ -113,6 +113,17 @@
     .secondary {
         background: #374151 !important;
     }
+
+    .bet-input {
+        margin-top: 12px;
+        display: none;
+        animation: fadeIn 0.3s ease;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(-5px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
 </style>
 </head>
 <body>
@@ -134,32 +145,39 @@ function addPlayer() {
     div.id = "player_" + playerId;
 
     div.innerHTML = `
-        <h2>Player #</h2>
+        <h2>Player #${playerId}</h2>
 
         <label>Deposit (€)</label>
-        <input type="number" id="deposit_" min="0" step="0.01">
+        <input type="number" id="deposit_${playerId}" min="0" step="0.01">
 
         <label>Bonus (€)</label>
-        <input type="number" id="bonus_" min="0" step="0.01">
+        <input type="number" id="bonus_${playerId}" min="0" step="0.01">
 
         <label>Wagering Requirement (x)</label>
-        <input type="number" id="wager_" min="1" step="1">
+        <input type="number" id="wager_${playerId}" min="1" step="1">
 
-        <button onclick="submitStats()">Submit Stats</button>
+        <button onclick="submitStats(${playerId})">Submit Stats</button>
 
         <div class="stats">
-            <p>Required Wager: <span id="required_">0.00</span> €</p>
-            <p>Total Wagered: <span id="wagered_">0.00</span> €</p>
-            <p>Remaining: <span id="remaining_">0.00</span> €</p>
+            <p>Required Wager: <span id="required_${playerId}">0.00</span> €</p>
+            <p>Total Wagered: <span id="wagered_${playerId}">0.00</span> €</p>
+            <p>Remaining: <span id="remaining_${playerId}">0.00</span> €</p>
 
             <div class="progress-bar">
-                <div class="progress-fill" id="progress_"></div>
+                <div class="progress-fill" id="progress_${playerId}"></div>
             </div>
-            <p id="progressLabel_">0% complete</p>
+            <p id="progressLabel_${playerId}">0% complete</p>
         </div>
 
-        <button id="addBetBtn_" onclick="addBet()" class="secondary" disabled>Add Bet</button>
-        <button onclick="removePlayer()" class="danger">Remove Player</button>
+        <button id="addBetBtn_${playerId}" onclick="toggleBetInput(${playerId})" class="secondary" disabled>Add Bet</button>
+
+        <div class="bet-input" id="betInput_${playerId}">
+            <label>Bet Amount (€)</label>
+            <input type="number" id="bet_${playerId}" min="0" step="0.01">
+            <button onclick="applyBet(${playerId})">Apply Bet</button>
+        </div>
+
+        <button onclick="removePlayer(${playerId})" class="danger">Remove Player</button>
     `;
 
     document.getElementById("players").appendChild(div);
@@ -190,15 +208,14 @@ function submitStats(id) {
     document.getElementById("wager_" + id).disabled = true;
 }
 
-function addBet(id) {
-    const betInput = prompt("Enter bet size (€):");
-    if (betInput === null) return;
+function toggleBetInput(id) {
+    const box = document.getElementById("betInput_" + id);
+    box.style.display = box.style.display === "block" ? "none" : "block";
+}
 
-    const bet = parseFloat(betInput.replace(",", "."));
-    if (isNaN(bet) || bet <= 0) {
-        alert("Invalid bet amount.");
-        return;
-    }
+function applyBet(id) {
+    const bet = parseFloat(document.getElementById("bet_" + id).value) || 0;
+    if (bet <= 0) return;
 
     const required = parseFloat(document.getElementById("required_" + id).innerText);
     let wagered = parseFloat(document.getElementById("wagered_" + id).innerText);
@@ -211,6 +228,8 @@ function addBet(id) {
     document.getElementById("remaining_" + id).innerText = remaining.toFixed(2);
 
     updateProgress(id);
+
+    document.getElementById("bet_" + id).value = "";
 }
 
 function updateProgress(id) {
@@ -230,3 +249,4 @@ function removePlayer(id) {
 
 </body>
 </html>
+
