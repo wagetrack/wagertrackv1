@@ -55,11 +55,6 @@
         box-shadow: var(--shadow);
     }
 
-    .player h2 {
-        margin: 0 0 10px 0;
-        font-size: 20px;
-    }
-
     label {
         display: block;
         margin-top: 10px;
@@ -139,7 +134,19 @@ function addPlayer() {
     div.id = "player_" + playerId;
 
     div.innerHTML = `
-        <h2>Player #${playerId}</h2>
+        <input 
+            id="name_${playerId}" 
+            value="Player #${playerId}" 
+            style="
+                width: 100%;
+                font-size: 20px;
+                font-weight: bold;
+                background: transparent;
+                border: none;
+                color: white;
+                margin-bottom: 10px;
+                outline: none;
+            ">
 
         <label>Deposit (€)</label>
         <input type="number" id="deposit_${playerId}" min="0" step="0.01">
